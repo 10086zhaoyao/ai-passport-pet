@@ -1,0 +1,39 @@
+# --- ESP-IDF 构建产物 ---
+build/
+build_host/
+managed_components/
+*.bin
+*.elf
+*.map
+*.uf2
+flasher_args.json
+
+# --- 本地配置（sdkconfig.defaults 受版本管理，sdkconfig 由它生成）---
+sdkconfig
+sdkconfig.old
+sdkconfig.ci
+
+# --- 工具链与本地环境 ---
+.espressif/
+.env
+
+# --- 日志与临时文件 ---
+*.log
+build*.log
+*.tmp
+*.bak
+*.swp
+logs/
+
+# --- IDE / 编辑器缓存 ---
+.vscode/
+.idea/
+.cache/
+compile_commands.json
+
+# Generated repository-local links; canonical skill sources live in skills/.
+/.agents/skills/passport-develop
+/.agents/skills/passport-setup
+/.agents/skills/passport-build
+/.agents/skills/passport-device-test
+/.agents/skills/passport-debug
