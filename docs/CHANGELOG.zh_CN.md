@@ -53,3 +53,10 @@
 - 同步更新索引：`docs/software-design/README.md`、`README.en_US.md` / `README.zh_CN.md` 的 `docs/` 目录说明。
 - 参考 cindy 仓库文档组织完善索引：新增 `docs/README.md` 根总索引；AGENTS.md 规则索引按触发场景改写（附触发条件）；`docs/contribution/` 与 `docs/development/` 的 README 补充收录标准。
 - 引入社区治理文档（参照 cindy 改写，放仓库根目录）：新增 `CONTRIBUTING.md` / `.zh_CN.md`（贡献指南，针对 ESP-IDF/AI agent/fork 场景改写）、`CODE_OF_CONDUCT.md` / `.zh_CN.md`（贡献者公约）、`SECURITY.md` / `.zh_CN.md`（安全报告流程）、`SUPPORT.md` / `.zh_CN.md`（支持渠道）；AGENTS.md 与 docs/README.md 同步引用。
+
+## v1.3 —— 2026-11-09
+
+- 彩色水墨主题首页新增 8 颗漂浮墨点，以墨青为主、两颗朱砂点缀；只在该主题首页可见时创建，省电时冻结。
+- 内置女性形象替换为暖砖红外套版本；脸与发型未改动，男性形象不受影响。
+- 修复配网页在部分手机自带浏览器中整页乱码的问题：响应同时带 `Content-Encoding: gzip` 与 `Vary: Accept-Encoding`。
+- 发布产物：合并固件 5,935,552 字节，SHA-256 `3762782A52EA0FE23A914AC791FE13DE85B0D80D4401ACC8A6AF979165AD46E3`。

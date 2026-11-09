@@ -9,9 +9,26 @@ screen carries a name, signature, serial number, portrait photo, and one of four
 display themes. Everything the user changes is stored in NVS and survives a
 power cycle.
 
+**Current release: v1.3**
+
 <p align="center">
   <img src="assets/images/home.jpg" alt="FoloToy AI Passport device, front, side, and back views" width="100%">
 </p>
+
+## What is new in v1.3
+
+- **Ink drifting on the home card**: the color ink-wash theme now shows eight
+  ink dots floating across the home card — mostly ink blue, with two cinnabar
+  accents. They appear only on that theme's home screen, and they stop moving
+  while the screen is in low-power mode.
+- **New built-in portrait**: the female portrait now wears a warm brick-red
+  jacket. The face and hairstyle are unchanged, and the male portrait is
+  untouched.
+- **Phone setup page fixed on mobile browsers**: the setup portal now sends
+  `Content-Encoding: gzip` together with `Vary: Accept-Encoding`, which fixes
+  the garbled page some phones showed when opening <http://192.168.4.1>.
+- **Release image**: merged firmware is 5,935,552 bytes with SHA-256
+  `3762782A52EA0FE23A914AC791FE13DE85B0D80D4401ACC8A6AF979165AD46E3`.
 
 ## What is in this firmware
 

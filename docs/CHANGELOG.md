@@ -56,3 +56,10 @@
 - Updated software-design and project README references for the new documentation structure.
 - Added the documentation catalog and task-triggered routing based on the earlier repository model.
 - Added bilingual contribution, code-of-conduct, security, and support documents tailored to this ESP-IDF and fork workflow.
+
+## v1.3 — 2026-11-09
+
+- Added eight drifting ink dots to the color ink-wash theme's home card, mostly ink blue with two cinnabar accents; they are created only while that theme's home screen is visible and freeze in low-power mode.
+- Replaced the built-in female portrait with a version wearing a warm brick-red jacket; the face and hairstyle are unchanged and the male portrait is untouched.
+- Fixed the Wi-Fi setup portal returning a garbled page in some mobile browsers by sending `Content-Encoding: gzip` together with `Vary: Accept-Encoding`.
+- Release image: merged firmware 5,935,552 bytes, SHA-256 `3762782A52EA0FE23A914AC791FE13DE85B0D80D4401ACC8A6AF979165AD46E3`.

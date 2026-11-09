@@ -302,6 +302,91 @@ static lv_obj_t *mk_clear(lv_obj_t *parent, int x, int y, int w, int h) {
     return o;
 }
 
+// ---------------------------------------------------------------------------
+// 首页水墨飞白粒子：仅第 4 套主题（idx==3）在首页可见时存在，切主题/离开首页立即销毁。
+// 8 颗 4~6px 实心方块，颜色已按纸底 0xF4EFE4 预混成不透明纯色 —— 任何对象都不设
+// opa<255，避免 LVGL 离屏层把 240x196 整块重合成。位置用 lv_tick_get() 三角波推算，
+// 10Hz 更新，只做原地小范围漂移，不下落。全部落在文字区/主视觉之外的留白带。
+// ---------------------------------------------------------------------------
+#define DUST_N 8
+#define DUST_TICK_MS 100
+#define DUST_THEME_IDX 3
+
+typedef struct {
+    int16_t cx, cy;      // 基准坐标（240x320 绝对）
+    uint8_t w, h;        // 4~6px
+    uint8_t ax, ay;      // 横/纵漂移幅度
+    uint16_t px, py;     // 横/纵三角波周期 ms
+    uint16_t phase;
+    uint32_t color;      // 预混纸底后的不透明色
+} dust_cfg_t;
+
+static const dust_cfg_t DUST[DUST_N] = {
+    // 左侧留白带 x4..28（主视觉 x32 起，强调条 y252 起）
+    { 12, 104, 5, 5, 5, 6, 2600, 4200,    0, 0xAFB6AE},
+    { 20, 186, 4, 4, 3, 5, 3200, 5200,  900, 0xC4C0B7},
+    // 右侧留白带 x212..236（电量右缘 228/y26 以上、头像框 y246 起）
+    {226,  74, 6, 6, 4, 6, 2800, 4600,  400, 0xC4C0B7},
+    {222, 152, 5, 5, 5, 5, 2400, 3800, 1500, 0xAFB6AE},
+    {230, 224, 4, 4, 2, 3, 3000, 4400,  700, 0xCE8B80},   // 朱砂点缀
+    // 顶部 clock 与主视觉之间 y33..46
+    {104,  40, 4, 4, 14, 2, 3400, 5600, 2100, 0xC4C0B7},
+    {188,  38, 4, 4, 10, 2, 2900, 4800,  300, 0xCE8B80},  // 朱砂点缀
+    // 底部留白带 y229..235（姓名区 y244 起）
+    {140, 232, 4, 4, 18, 3, 3600, 6000, 1100, 0xAFB6AE},
+};
+
+static lv_obj_t *s_dust_layer;
+static lv_obj_t *s_dust[DUST_N];
+static uint32_t s_dust_ms;
+
+static int32_t dust_tri(uint32_t t, uint16_t period, uint8_t amp) {
+    if (period == 0) return 0;
+    const int32_t half = period / 2;
+    const int32_t p = (int32_t)(t % period);
+    const int32_t v = (p < half) ? p : (period - p);   // 0..half
+    return (v * 2 * (int32_t)amp) / half - (int32_t)amp;
+}
+
+static void dust_create(void) {
+    if (s_dust_layer || !s_home_scr) return;
+    s_dust_layer = mk_clear(s_home_scr, 0, 0, THEME_W, THEME_H);
+    lv_obj_move_to_index(s_dust_layer, 1);   // 底图之上、文字/主视觉之下
+    for (int i = 0; i < DUST_N; i++) {
+        const dust_cfg_t *d = &DUST[i];
+        lv_obj_t *o = mk_clear(s_dust_layer, d->cx, d->cy, d->w, d->h);
+        lv_obj_set_style_bg_color(o, lv_color_hex(d->color), 0);
+        lv_obj_set_style_bg_opa(o, LV_OPA_COVER, 0);
+        s_dust[i] = o;
+    }
+    s_dust_ms = 0;
+}
+
+static void dust_destroy(void) {
+    if (!s_dust_layer) return;
+    lv_obj_delete(s_dust_layer);
+    s_dust_layer = NULL;
+    for (int i = 0; i < DUST_N; i++) s_dust[i] = NULL;
+}
+
+// 唯一开关：主题 3 + 首页。其它主题/页面一律销毁，不留后台对象。
+static void dust_sync(void) {
+    if (s_theme_idx == DUST_THEME_IDX && s_view == VIEW_HOME) dust_create();
+    else dust_destroy();
+}
+
+static void dust_tick(uint32_t now_ms) {
+    if (!s_dust_layer || s_view != VIEW_HOME || s_low_power) return;   // 省电冻结
+    if ((uint32_t)(now_ms - s_dust_ms) < DUST_TICK_MS) return;
+    s_dust_ms = now_ms;
+    for (int i = 0; i < DUST_N; i++) {
+        const dust_cfg_t *d = &DUST[i];
+        const int32_t x = d->cx + dust_tri(now_ms + d->phase, d->px, d->ax);
+        const int32_t y = d->cy + dust_tri(now_ms + d->phase * 2u, d->py, d->ay);
+        lv_obj_set_pos(s_dust[i], x, y);
+    }
+}
+
 static lv_obj_t *mk_text(lv_obj_t *parent, const char *text, const lv_font_t *font,
                          uint32_t color) {
     lv_obj_t *l = lv_label_create(parent);
@@ -1242,6 +1327,7 @@ static void enter_view(view_t v) {
     } else {
         lv_screen_load(s_portal_scr);
     }
+    dust_sync();   // 水墨粒子只存在于「主题 3 + 首页」，其余情况立即销毁
 }
 
 // ---------------------------------------------------------------------------
@@ -1455,6 +1541,9 @@ static void ui_tick(uint32_t dt) {
     if (s_view == VIEW_PET && s_pet_scr) {
         pet_bg_tick(dt, clock_now(), weather_kind());
     }
+
+    // 首页水墨粒子：10Hz 原地漂移；离开首页或省电态自动冻结/不存在。
+    dust_tick(now_ms);
 
     // 每秒：冷却倒计时 + 门户倒计时/超时 + 环境标签
     s_cd_ms += (int32_t)dt;
@@ -2135,6 +2224,7 @@ static void theme_step(int dir) {
     theme_set_src();
     theme_apply_colors();
     avatar_apply();
+    dust_sync();   // 切到/切离第 4 套时同步创建或销毁粒子层
     /* 切主题/设置静音：不触发任何语音 */
 }
 
@@ -2813,6 +2903,14 @@ void pet_app_shot_scene(const char *name) {
         // 截图钩子：切主人形象（不落 NVS），验证头像框即时刷新。
         s_profile.sex = (name[3] == '1') ? 1 : 0;
         avatar_apply();
+        enter_view(VIEW_HOME);
+    } else if (strcmp(name, "sex1b") == 0) {
+        // 截图钩子：设备里已有上传头像时强制显示内置女形象（不落 NVS，仅出图用）。
+        s_profile.sex = 1;
+        s_av_buf = (uint8_t *)avatar_default_slot(1);
+        av_geom();
+        duo_apply();
+        if (s_hero_img) lv_image_set_src(s_hero_img, &s_av_dsc);
         enter_view(VIEW_HOME);
     } else if (strcmp(name, "hero") == 0 || strcmp(name, "heroc") == 0) {
         // 截图钩子：主视觉 = 头像 / 猫（不落 NVS）。

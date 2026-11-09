@@ -236,6 +236,9 @@ static esp_err_t h_root(httpd_req_t *req) {
                     strstr(enc, "gzip") != NULL;
     httpd_resp_set_type(req, "text/html; charset=utf-8");
     httpd_resp_set_hdr(req, "Cache-Control", "no-store");
+    // 发了 gzip 体就必须声明 Content-Encoding，否则浏览器把压缩流当 HTML 解码（手机自带浏览器整页乱码）。
+    if (gz) httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
+    httpd_resp_set_hdr(req, "Vary", "Accept-Encoding");
     // 证据日志：页面上线/发完各一条，带上堆水位，便于判断“200 但发不完”还是真 200。
     const uint32_t h0 = esp_get_free_heap_size();
     ESP_LOGI(TAG, "GET / 开始: %s %d B, free=%uB largest=%uB",
