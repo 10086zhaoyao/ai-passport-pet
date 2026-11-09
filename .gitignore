@@ -1,12 +1,17 @@
 # --- ESP-IDF 构建产物 ---
 build/
 build_host/
+build_ui/
 managed_components/
 *.bin
 *.elf
 *.map
 *.uf2
 flasher_args.json
+
+# main/ 下的 .bin 是固件资源（themes/sprites/signs/字体/音效），构建必需，必须入库。
+# 上面的 *.bin 只用于拦构建产物；这里的否定规则把资源放回来。
+!main/*.bin
 
 # --- 本地配置（sdkconfig.defaults 受版本管理，sdkconfig 由它生成）---
 sdkconfig

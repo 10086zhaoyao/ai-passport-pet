@@ -14,11 +14,13 @@ bool wifi_portal_open(void);
 void wifi_portal_close(void);
 bool wifi_portal_is_open(void);
 
-// 距最近一次 HTTP 请求是否已超过 180 秒（门户空闲超时）。
+// 距最近一次“活动”是否已超过空闲上限（HTTP 请求、AP 客户端接入/断开都会重置）。
 bool wifi_portal_expired(void);
 
 // 最近一次 HTTP 请求的时间戳（esp_timer_get_time 基准），供 UI 显示剩余时间。
 long long wifi_portal_last_req_us(void);
+// 门户空闲自动关闭的时长（微秒），屏幕倒计时要和它保持一致。
+long long wifi_portal_idle_us(void);
 
 // 热点信息（门户开启后有效）。密码运行时由 MAC 派生，只显示在屏幕上。
 const char *wifi_portal_ssid(void);
@@ -26,3 +28,7 @@ const char *wifi_portal_pass(void);
 
 // 是否已连上路由器（STA）。
 bool wifi_portal_connected(void);
+
+// 最近一次 wifi_portal_open 失败的原因（LOW MEM / AP FAIL / HTTP FAIL / WIFI FAIL），
+// 供屏幕直接显示；成功时返回 "FAIL"。
+const char *wifi_portal_last_error(void);

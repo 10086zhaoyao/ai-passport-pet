@@ -28,8 +28,23 @@ CONFIG_LV_FONT_MONTSERRAT_20=y
 # 坦克大战的精灵/HUD 对象较多。48KB 在真机上实测不足:开机一次性构建
 # 首页/设置/指引/ACE/表盘 5 屏 + 游戏 HUD 约 200 个对象,lv_obj_create
 # 返回 NULL 后触发 LVGL 断言 while(1),表现为背光亮但白屏。
-# 提到 96KB 留出余量。
-CONFIG_LV_MEM_SIZE_KILOBYTES=96
+# 实测 96KB 时空闲仅 40.8KB，切 SoftAP 时 WiFi 动态缓冲申请失败（alloc eb len=752）
+# 直接 Load access fault 复位。收到 72KB 后再收到 64KB：对象稳态占用约 48KB
+# （PERF pool_max=48080B），仍留 ~15KB 余量；把这 8KB 还给系统堆，供开热点+httpd 用。
+# 若真机出现 lv_obj_create 返回 NULL 白屏，再回调到 72KB。
+# LVGL 池：实测峰值 46,692 B，64K 里有约 27 KB 长期闲置。
+# 收到 56K（实际池 52,588 B），把 8 KB 还给系统堆给 WiFi 门户用，同时保留约 5.9 KB 余量。
+CONFIG_LV_MEM_SIZE_KILOBYTES=56
+
+# --- WiFi 缓冲（C3 内存紧，按最小可用配）---
+# 静态 RX 2 / 动态 RX 4 / 动态 TX 4：门户起来后实测只剩 9.4KB，httpd(8KB 栈) 起不来；
+# 每条动态缓冲 1600B，各减 2 条还给堆 6.4KB。RX_BA_WIN 必须 ≤ 2×静态 RX
+# （IDF 编译期 #error 强制），所以 2 静态 → BA 窗 4。
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=2
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=4
+CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM=4
+CONFIG_ESP_WIFI_RX_BA_WIN=4
+CONFIG_ESP_WIFI_MGMT_SBUF_NUM=12
 
 # --- 系统 ---
 CONFIG_FREERTOS_HZ=1000

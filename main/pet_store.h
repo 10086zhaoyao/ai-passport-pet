@@ -16,3 +16,6 @@ void pet_store_load(pet_state_t *out, pet_load_info_t *info);
 
 // 只在状态变化时调用。写入较旧槽并回读校验；失败时旧槽保持不变。
 bool pet_store_save(const pet_state_t *s);
+
+// 联调专用：写一份"旧版形状"存档（领养时间所在保留位全 0），验证旧档可读、不清档。
+bool pet_store_test_old_blob(void);

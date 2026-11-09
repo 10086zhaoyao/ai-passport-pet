@@ -33,6 +33,17 @@ Store reusable source images and generated display assets in `images/`.
 - Preserve editable sources where licensing permits, and record the source and license.
 - Never commit device QR secrets, credentials, or personal data in images.
 
+## Art sources
+
+`art/` holds the flat set of source images consumed by
+[`tools/pack_assets.py`](../tools/pack_assets.py): four card faces, cat frames and
+poses, accessories, owner portraits, and signature marks. The per-file table and
+the byte-level acceptance checks are in
+[`docs/development/engineering/asset-pipeline.md`](../docs/development/engineering/asset-pipeline.md).
+
+Only sources that the packing script actually reads belong here. Intermediate
+renders, comparison sheets, previews, and screenshots do not.
+
 ## Music and sound effects
 
 Store reusable music and sound-effect sources in `music/`.

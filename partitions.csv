@@ -1,4 +1,6 @@
 # Name,   Type, SubType, Offset,   Size,     Flags
-nvs,      data, nvs,     0x9000,   0x6000,
-phy_init, data, phy,     0xf000,   0x1000,
-factory,  app,  factory, 0x10000,  0x7f0000,
+# 存档放在 app 之后：factory 到 0x700000 结束，整包更新只覆盖 0x0..app 末尾，
+# 从此不再擦掉 NVS。标签必须保持 nvs（代码里 nvs_open("passport") 依赖它）。
+phy_init, data, phy,     0x9000,   0x1000,
+factory,  app,  factory, 0x10000,  0x6F0000,
+nvs,      data, nvs,     0x700000, 0x100000,

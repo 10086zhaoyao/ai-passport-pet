@@ -31,6 +31,15 @@
 - 许可允许时保留可编辑源文件，并记录来源与许可。
 - 图片中不得包含设备二维码秘密、凭证或个人数据。
 
+## 美术真源（art）
+
+`art/` 存放 [`tools/pack_assets.py`](../tools/pack_assets.py) 直接消费的平铺源图：
+四套卡面、猫的动作帧与姿态、配件、主人形象、落款签名 mark。逐文件对照表与
+字节级验收方式见
+[`docs/development/engineering/asset-pipeline.zh_CN.md`](../docs/development/engineering/asset-pipeline.zh_CN.md)。
+
+这里只放打包脚本真正读到的源文件；中间渲染图、比对图、预览图、截图都不放。
+
 ## 音乐与音效（music）
 
 可复用的音乐与音效源码放在 `music/`。

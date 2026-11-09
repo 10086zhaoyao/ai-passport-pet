@@ -12,3 +12,10 @@ void pet_app_set_epoch(int64_t epoch);
 
 // 网页端改了昵称/签名后调用，刷新卡片文字（内部加 LVGL 锁）。
 void pet_app_refresh(void);
+
+// 联调测试入口（串口 FAP_TEST 转发）：bench/keys/theme20/audio20/soak/lat/clock/navdump/oldblob。
+void pet_app_test_cmd(const char *args);
+
+// 截图/联调用：直接切到指定场景，避免人工按键。
+// name: "home" | "play" | "nest" | "sleep" | "happy" | "glass"
+void pet_app_shot_scene(const char *name);

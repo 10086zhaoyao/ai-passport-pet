@@ -9,7 +9,10 @@
 
 static const char *TAG = "bsp_lvgl";
 
-#define BSP_LVGL_DRAW_BUFFER_LINES 40
+// 单缓冲 20 行 = 240*20*2 = 9.6KB。原来 40 行要 19.2KB，而 C3 在门户（AP+HTTP）
+// 期间堆只剩 12.6KB，客户端一关联就跌到 856B，HTTP 响应体发不出去（send EAGAIN）。
+// 20 行多出 9.6KB 常驻堆，刷新分 16 个窗口而不是 8 个，肉眼无差别。
+#define BSP_LVGL_DRAW_BUFFER_LINES 20
 
 static lv_display_t *s_disp;
 static bool s_port_initialized;

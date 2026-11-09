@@ -304,7 +304,7 @@ static esp_err_t i2s_full_duplex_init(void) {
         .id = BSP_I2S_PORT,
         .role = I2S_ROLE_MASTER,
         .dma_desc_num = 6,
-        .dma_frame_num = 240,
+        .dma_frame_num = 512,   // 6×512=3072 帧 @16kHz = 192ms，留足抗调度抖动余量
         .auto_clear_after_cb = true,
         .auto_clear_before_cb = false,
         .intr_priority = 0,
